@@ -138,6 +138,10 @@ contract MyStrategy is BaseStrategy {
         override
         returns (uint256)
     {
+        if (_amount > balanceOfPool()) {
+            _amount = balanceOfPool();
+        }
+        ILendingPool(LENDING_POOL).withdraw(want, _amount, address(this));
         return _amount;
     }
 
