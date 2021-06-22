@@ -176,6 +176,17 @@ contract MyStrategy is BaseStrategy {
     /// @dev Rebalance, Compound or Pay off debt here
     function tend() external whenNotPaused {
         _onlyAuthorizedActors();
+
+        if (balanceOfWant() > 0) {
+            ILendingPool(LENDING_POOL).deposit(
+                want,
+                balanceOfWant(),
+                address(this),
+                0
+            );
+            //balanceOfWant is from BaseStrategy.sol
+        }
+        //if there is a balance deposit it
     }
 
     /// ===== Internal Helper Functions =====
