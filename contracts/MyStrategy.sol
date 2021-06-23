@@ -25,6 +25,8 @@ contract MyStrategy is BaseStrategy {
     address public reward; // Token we farm and swap to want / aToken
     address public constant LENDING_POOL =
         0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9; //lending pool address
+    address public constant INCENTIVES_CONTROLLER =
+        0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5; //rewards
 
     function initialize(
         address _governance,
