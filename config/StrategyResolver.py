@@ -70,6 +70,11 @@ class StrategyResolver(StrategyCoreResolver):
             after.get("strategy.balanceOfWant") == 0
         )  # make sure there is no balance after tending
 
+        assert after.get("strategy.balanceOfPool") > before.get(
+            "strategy.balanceOfPool"
+        )
+        # Check there is an increase in the balance of the pool afterwards
+
     def get_strategy_destinations(self):
         """
         Track balances for all strategy implementations
