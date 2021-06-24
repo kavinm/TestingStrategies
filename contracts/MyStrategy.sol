@@ -63,6 +63,12 @@ contract MyStrategy is BaseStrategy {
         /// @dev do one off approvals here
         IERC20Upgradeable(want).safeApprove(LENDING_POOL, type(uint256).max);
         // the lending pool address is approved here
+
+        IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
+        //uniswap approved here
+
+        IERC20Upgradeable(AAVE_TOKEN).safeApprove(ROUTER, type(uint256).max);
+        //aave token approved
     }
 
     /// ===== View Functions =====
