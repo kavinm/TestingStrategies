@@ -30,8 +30,8 @@ contract MyStrategy is BaseStrategy {
     address public constant INCENTIVES_CONTROLLER = 0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5; //rewards
 
     address public constant ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // aave router
-    address public constant AAVE_TOKEN = 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9; //not check summed
-    address public constant WETH_TOKEN = 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2;
+    address public constant AAVE_TOKEN = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9 ;
+    address public constant WETH_TOKEN = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
 
     function initialize(
@@ -173,11 +173,36 @@ contract MyStrategy is BaseStrategy {
             return 0;
         }
 
-        
+        //swap from stkAAVE to AAVE
+        ISwapRouter.ExactInputSingleParams memory fromRewardToAAVEParams = ISwapRouter.ExactInputSingleParams(
+            reward,
+            AAVE_TOKEN,
+            10000,
+            address(this),
+            now,
+            rewardsAmount,      //exploitable, can use chainlink or some oracle to fix
+            0,
+            0
+        );
+        ISwapRouter(ROUTER).exactInputSingle(fromRewardToAAVEParams);
+
+        bytes memory path = abi.encodePacked(AAVE_TOKEN, uint24(10000), WETH_TOKEN, uint24(10000), want); // the path from aave to weth
+        //up to 1% cost is the 10000
+
+
+        ISwapRouter.ExactInputParams memory fromAAVETowBTCParams = ISwapRouter.ExactInputParams(
+            path,
+            address(this),
+            now,                                                    //exploitable, can use chainlink or some oracle to fix
+            IERC20Upgradeable(AAVE_TOKEN).balanceOf(address(this)),
+            0
+        );
+
+        ISwapRouter(ROUTER).exactInput(fromAAVETowBTCParams); //swapping from aave to wbtc using uniswap like above
+
 
         
-        uint256 earned =
-            IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
+        uint256 earned =IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
 
         /// @notice Keep this in so you get paid!
         (uint256 governancePerformanceFee, uint256 strategistPerformanceFee) =
