@@ -16,6 +16,8 @@ import "../interfaces/aave/IAaveIncentivesController.sol";
 
 import {BaseStrategy} from "../deps/BaseStrategy.sol";
 
+import "../interfaces/uniswap/ISwapRouter.sol";
+
 contract MyStrategy is BaseStrategy {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
@@ -170,6 +172,8 @@ contract MyStrategy is BaseStrategy {
         if(rewardsAmount == 0){ //must return 0 if no rewards
             return 0;
         }
+
+        
 
         
         uint256 earned =
