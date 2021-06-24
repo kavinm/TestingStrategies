@@ -38,17 +38,20 @@ class StrategyResolver(StrategyCoreResolver):
             "sett.pricePerFullShare"
         )
 
-        # # Strategist should earn if fee is enabled and value was generated
-        # if before.get("strategy.performanceFeeStrategist") > 0 and valueGained:
-        #     assert after.balances("want", "strategist") > before.balances(
-        #         "want", "strategist"
-        #     )
+        # check that the harvest actually gave us some more money
+        assert valueGained == True
 
-        # # Strategist should earn if fee is enabled and value was generated
-        # if before.get("strategy.performanceFeeGovernance") > 0 and valueGained:
-        #     assert after.balances("want", "governanceRewards") > before.balances(
-        #         "want", "governanceRewards"
-        #     )
+        # Strategist should earn if fee is enabled and value was generated
+        if before.get("strategy.performanceFeeStrategist") > 0 and valueGained:
+            assert after.balances("want", "strategist") > before.balances(
+                "want", "strategist"
+            )
+
+        # Strategist should earn if fee is enabled and value was generated
+        if before.get("strategy.performanceFeeGovernance") > 0 and valueGained:
+            assert after.balances("want", "governanceRewards") > before.balances(
+                "want", "governanceRewards"
+            )
 
     def confirm_tend(self, before, after, tx):
         """
