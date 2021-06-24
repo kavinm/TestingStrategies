@@ -12,6 +12,7 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 import "../interfaces/badger/IController.sol";
 
 import "../interfaces/aave/ILendingPool.sol";
+import "../interfaces/aave/IAaveIncentivesController.sol";
 
 import {BaseStrategy} from "../deps/BaseStrategy.sol";
 
@@ -23,10 +24,13 @@ contract MyStrategy is BaseStrategy {
     // address public want // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public aToken; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / aToken
-    address public constant LENDING_POOL =
-        0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9; //lending pool address
-    address public constant INCENTIVES_CONTROLLER =
-        0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5; //rewards
+    address public constant LENDING_POOL = 0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9; //lending pool address
+    address public constant INCENTIVES_CONTROLLER = 0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5; //rewards
+
+    address public constant ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564; // aave router
+    address public constant AAVE_TOKEN = 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9; //not check summed
+    address public constant WETH_TOKEN = 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2;
+
 
     function initialize(
         address _governance,
@@ -154,7 +158,20 @@ contract MyStrategy is BaseStrategy {
         uint256 _before = IERC20Upgradeable(want).balanceOf(address(this));
 
         // Write your code here
+        //figure out and claim our rewards
 
+        address[] memory assets = new address[](1);
+        assets[0] = aToken;
+
+        IAaveIncentivesController(INCENTIVES_CONTROLLER).claimRewards(assets, type(uint256).max, address(this)); //(assests, amount, to)
+
+        uint256 rewardsAmount = IERC20Upgradeable(reward).balanceOf(address(this)); // checks how much the reward is
+
+        if(rewardsAmount == 0){ //must return 0 if no rewards
+            return 0;
+        }
+
+        
         uint256 earned =
             IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
 
